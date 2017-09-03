@@ -275,7 +275,7 @@ scheduler.add_job(
     # replace_existing=True)
 
     func=daily_report,
-    trigger='cron', hour='20', minute='58')
+    trigger='cron', hour='6', minute='45')
 
 # Shut down the scheduler when exiting the app
 atexit.register(lambda: scheduler.shutdown())
