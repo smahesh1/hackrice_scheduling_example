@@ -6,6 +6,6 @@ if os.environ.get('DATABASE_URL') is None:
 else:
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
-DAILY_NOTIFY_CHANNEL = "C63FDFYSD"
-BOT_ID = 'U6CK12WNR'
-SLACK_BOT_TOKEN = 'xoxb-216647098773-RggycYpGSbwT5Wj6AZ4IShkR'
+DAILY_NOTIFY_CHANNEL = os.environ['DAILY_NOTIFY_CHANNEL']
+BOT_ID = os.environ['BOT_ID']
+SLACK_BOT_TOKEN = os.environ['SLACK_BOT_TOKEN']
