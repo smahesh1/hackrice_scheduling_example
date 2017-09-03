@@ -1,2 +1,2 @@
-web: python starterbot.py
+worker: python starterbot.py
 init: python db_create.py
