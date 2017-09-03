@@ -296,5 +296,8 @@ if __name__ == "__main__":
 
 
     else:
+        print(SLACK_BOT_TOKEN)
+        print(BOT_ID)
+        print(DAILY_NOTIFY_CHANNEL)
         print("Connection failed. Invalid Slack token or bot ID?")
 
