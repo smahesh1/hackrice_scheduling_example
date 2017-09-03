@@ -1,5 +1,4 @@
 db_repository/
 starterbot/
-config.py
 app.db
 __pycache__/
