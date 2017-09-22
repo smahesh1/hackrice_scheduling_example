@@ -1,10 +1,13 @@
 import os
 import time
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean
-from sqlalchemy.orm import sessionmaker, scoped_session
+#from sqlalchemy import create_engine
+#from sqlalchemy.ext.declarative import declarative_base
+#from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean
+#from sqlalchemy.orm import sessionmaker, scoped_session
 from slackclient import SlackClient
+
+from app import app, db, models
+
 
 from config import SQLALCHEMY_DATABASE_URI
 from config import SQLALCHEMY_MIGRATE_REPO
@@ -17,29 +20,7 @@ import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
-
-engine = create_engine( SQLALCHEMY_DATABASE_URI, echo=False)
-
-Base = declarative_base()
-
-class Event(Base):
-    """
-    A table to store data on craigslist listings.
-    """
-
-    __tablename__ = 'events'
-
-    id = Column(Integer, primary_key=True)
-    description = Column(String)
-    date = Column(String)
-    location = Column(String)
-    start_time = Column(String)
-    end_time = Column(String)
-
-Base.metadata.create_all(engine)
-
-session = scoped_session(sessionmaker(bind=engine))
-
+Event = models.Event
 
 
 # constants
@@ -71,7 +52,7 @@ def find_largest_id():
     TODO:Make this function nicer
     """
     max_id_val= 0
-    for event in session.query(Event).all():
+    for event in Event.query.all():
         if event.id > max_id_val:
             max_id_val = event.id
     return max_id_val
@@ -119,7 +100,7 @@ def handle_create_event(command):
         end_time = handle_time(times[1].strip())
         date = handle_date(((event_string.split("date:"))[1].split(",")[0]).strip())
 
-        if len(session.query(Event).all()) > 0:
+        if len(Event.query.all()) > 0:
             id_val = find_largest_id() + 1
         else:
             id_val = 1
@@ -146,8 +127,8 @@ def handle_command(command, channel, daily_response=False):
     if command.startswith(CREATE_EVENT_COMMAND):
         try:
             event = handle_create_event(command)
-            session.add(event)
-            session.commit()
+            db.session.add(event)
+            db.session.commit()
             response = ("You have successfully created the following event: \n" + 
             niceify_response(event.id, event.description, event.location, event.start_time, event.end_time, event.date))
 
@@ -158,7 +139,7 @@ def handle_command(command, channel, daily_response=False):
     elif command.startswith(GET_EVENTS_ON_COMMAND):
         try:
             event_date= command.split(GET_EVENTS_ON_COMMAND)[1].strip()
-            events = session.query(Event).filter(Event.date == handle_date(event_date))
+            events = Event.query.filter(Event.date == handle_date(event_date))
             response = ""
             if events.count() == 0:
                 response = "There are no events on " + event_date
@@ -173,7 +154,7 @@ def handle_command(command, channel, daily_response=False):
     elif command.startswith(GET_LAST_COMMAND):
         try:
             event_number= command.split(GET_LAST_COMMAND)[1].strip()
-            events = session.query(Event).order_by(Event.id.desc()).limit(event_number)
+            events = Event.query.order_by(Event.id.desc()).limit(event_number)
 
             #events = reversed(conn.execute(query).fetchall())
             response = ""
@@ -188,7 +169,7 @@ def handle_command(command, channel, daily_response=False):
     elif command.startswith(GET_TODAY_COMMAND):
         try:
             event_date = time.strftime("%x")
-            events = session.query(Event).filter(Event.date == handle_date(event_date))
+            events = Event.query.filter(Event.date == handle_date(event_date))
             response = ""
             if events.count() == 0:
                 response = "There are no events today"
@@ -202,7 +183,7 @@ def handle_command(command, channel, daily_response=False):
     elif command.startswith(GET_EVENT_COMMAND):
         try:
             event_id = command.split(GET_EVENT_COMMAND)[1].strip()
-            event = session.query(Event).filter(Event.id == int(event_id)).first()
+            event = Event.query.filter(Event.id == int(event_id)).first()
             response = niceify_response(event.id, event.description, event.location, event.start_time, event.end_time, event.date)
         except Exception as e:
             response = str(e)
@@ -211,9 +192,9 @@ def handle_command(command, channel, daily_response=False):
     elif command.startswith(DELETE_EVENT_COMMAND):
         try:
             event_id = command.split(DELETE_EVENT_COMMAND)[1].strip()
-            event = session.query(Event).filter(Event.id == int(event_id)).first()
-            session.delete(event)
-            session.commit()
+            event = Event.query.filter(Event.id == int(event_id)).first()
+            db.session.delete(event)
+            db.session.commit()
             response = "You have deleted the following event \n" + niceify_response(event.id, event.description, event.location, event.start_time, event.end_time, event.date)
         except Exception as e:
             response = str(e)
@@ -264,7 +245,7 @@ def daily_report():
     #Wrap daily report in a different method
     handle_command("get events today", DAILY_NOTIFY_CHANNEL, True)
 
-
+#For monitoring daily responses
 scheduler = BackgroundScheduler()
 scheduler.start()
 scheduler.add_job(
