@@ -1,2 +1,3 @@
 worker: python starterbot.py
-init: python db_create.py
+web: gunicorn app:app
+init: python db_create_flask.py

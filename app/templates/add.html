@@ -1,0 +1,66 @@
+ {% extends "base.html" %}
+
+ {% block content %}
+ {% include 'flash.html' %}
+        <br />
+        <h2>Add Event</h2>
+        <br />
+
+ <form action="" method="post" name="post" id="form" style= "display:block">
+      {{form.hidden_tag()}}
+      <table>
+          <tr class="spaceUnder">
+              <td>Description:</td>
+              <td>{{ form.description(size=30, maxlength=300) }}</td>
+              <td>
+              {% for error in form.description.errors %}
+              <span style="color: red;">[{{ error }}]</span><br>
+              {% endfor %}
+              </td>
+          </tr>
+          <tr class="spaceUnder">
+              <td>Start Time:</td>
+              <td>{{ form.start_time(size=30, maxlength=100) }}</td>
+              <td>
+              {% for error in form.start_time.errors %}
+              <span style="color: red;">[{{ error }}]</span><br>
+              {% endfor %}
+              </td>
+          </tr >
+          <tr class="spaceUnder">
+              <td>End Time:</td>
+              <td>{{ form.end_time(size=30, maxlength=100) }}</td>
+              <td>
+              {% for error in form.end_time.errors %}
+              <span style="color: red;">[{{ error }}]</span><br>
+              {% endfor %}
+              </td>
+          </tr >
+          <tr class="spaceUnder">
+              <td>Location:</td>
+              <td>{{ form.location(size=30, maxlength=200) }}</td>
+              <td>
+              {% for error in form.location.errors %}
+              <span style="color: red;">[{{ error }}]</span><br>
+              {% endfor %}
+              </td>
+          </tr>
+          <tr class="spaceUnder">
+              <td>Date:</td>
+              <td>{{ form.date(size=30, maxlength=140) }}</td>
+              <td>
+              {% for error in form.date.errors %}
+              <span style="color: red;">[{{ error }}]</span><br>
+              {% endfor %}
+              </td>
+          </tr>
+          <tr>
+              <td></td>
+              <td><button type="submit" class="btn btn-primary">Add</button></td>
+              <td></td>
+          </tr>
+      </table>
+  </form
+
+
+{% endblock %}
