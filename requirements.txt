@@ -22,7 +22,7 @@ Tempita==0.5.2
 tzlocal==1.4
 urllib3==1.22
 websocket-client==0.44.0
-Werkzeug==0.12.2
+Werkzeug==0.15.3
 WTForms==2.1
 gunicorn==19.1.1
 psycopg2==2.5.4
